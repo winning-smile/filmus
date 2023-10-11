@@ -5,128 +5,95 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#494949"
-    tools:context=".Create_Activity">
+    tools:context=".CreateActivity">
 
-    <TableLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 
-        <TableRow
+        <LinearLayout
+            android:id="@+id/createLayout"
             android:layout_width="match_parent"
-            android:layout_height="84dp">
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <com.jaredrummler.materialspinner.MaterialSpinner
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="50dp" />
+
+            <Spinner
                 android:id="@+id/genreSpinner"
-                android:layout_width="300dp"
-                android:layout_height="48dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="50dp"
-                android:layout_marginRight="10dp"
-                app:ms_dropdown_max_height="300dp"
-                app:ms_hint="Выберите жанр" />
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/floatingActionButton2"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_marginTop="50dp"
-                android:background="#BC6262"
-                android:clickable="true"
-                app:backgroundTint="#BC6262"
-                app:fabCustomSize="35dp"
-                app:srcCompat="@android:drawable/ic_input_add" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <com.jaredrummler.materialspinner.MaterialSpinner
-                android:id="@+id/sortSpineer"
-                android:layout_width="299dp"
-                android:layout_height="48dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="50dp"
-                app:ms_hint="Выберите порядок" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="168dp" >
-
-            <com.jaredrummler.materialspinner.MaterialSpinner
-                android:id="@+id/quanitySpinner"
-                android:layout_width="300dp"
+                android:prompt="@string/genre_spinner_hint"
+                android:layout_width="350dp"
                 android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="50dp"
-                app:ms_hint="Выберите количество фильмов" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <CheckBox
-                android:id="@+id/soloRoomCheckbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="50dp"
-                android:text="Одиночная комната" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="40dp">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/hostNameInputLayout"
-                android:layout_width="300dp"
-                android:layout_height="48dp"
-                android:layout_marginTop="50dp">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/hostNameField"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:hint="Отображаемое имя" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="40dp">
+                android:entries="@array/genreItems"
+                android:spinnerMode="dialog" />
 
             <Button
-                android:id="@+id/createRoomButton"
-                android:layout_width="200dp"
+                android:id="@+id/addGenreButton"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
-                android:text="Создать комнату" />
-        </TableRow>
+                android:text="@string/add_genre_text" />
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="40dp"
-            android:layout_marginTop="50dp">
+            <Spinner
+                android:id="@+id/sortSpinner"
+                android:prompt="@string/sort_spinner_hint"
+                android:layout_width="350dp"
+                android:layout_height="50dp"
+                android:spinnerMode="dialog"
+                android:entries="@array/sortItems" />
+
+            <Spinner
+                android:id="@+id/quanitySpinner"
+                android:prompt="@string/quanity_spinner_hint"
+                android:layout_width="350dp"
+                android:layout_height="50dp"
+                android:spinnerMode="dialog"
+                android:entries="@array/quanityItems" />
+
+            <CheckBox
+                android:id="@+id/soloCheckBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/solo_checkbox_text" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/display_name_field_hint"
+                android:textColorHint="#FFFFFF">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/soloNameField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/display_name_field_hint" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <Button
                 android:id="@+id/returnCButton"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:text="Назад" />
-        </TableRow>
-    </TableLayout>
+                android:layout_weight="0.5"
+                android:text="@string/return_button_text" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/continueButton"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="@string/create_room_text" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="250dp" />
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

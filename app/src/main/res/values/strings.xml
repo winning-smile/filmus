@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Filmus</string>
+    <string name="genre_spinner_hint">Добавить жанр</string>
+    <string name="sort_spinner_hint">Сортировать по</string>
+    <string name="quanity_spinner_hint">Количество фильмов</string>
+    <string name="add_genre_text">Добавить жанр</string>
+    <string name="display_name_field_hint">Отображаемое имя</string>
+    <string name="solo_checkbox_text">Одиночная комната</string>
+    <string name="return_button_text">Назад</string>
+    <string name="create_room_text">Создать комнату</string>
+    <string name="join_room_text">Присоединиться</string>
+    <string name="code_field_hint">Введите код</string>
 </resources>

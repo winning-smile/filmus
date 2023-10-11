@@ -13,10 +13,10 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
         <activity
-            android:name=".Activity_Join"
+            android:name=".JoinActivity"
             android:exported="false" />
         <activity
-            android:name=".Create_Activity"
+            android:name=".CreateActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

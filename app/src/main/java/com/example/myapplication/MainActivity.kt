@@ -14,12 +14,12 @@ class MainActivity : AppCompatActivity() {
         val joinButton = findViewById<Button>(R.id.joinMainButton)
 
         createButton.setOnClickListener{
-            val intent = Intent(this, Create_Activity::class.java)
+            val intent = Intent(this, CreateActivity::class.java)
             startActivity(intent)
         }
 
         joinButton.setOnClickListener{
-            val intent = Intent(this, Activity_Join::class.java)
+            val intent = Intent(this, JoinActivity::class.java)
             startActivity(intent)
         }
     }
