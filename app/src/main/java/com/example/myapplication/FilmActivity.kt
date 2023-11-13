@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -7,23 +8,25 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.TextView
-import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
-import com.google.android.material.navigation.NavigationView
 import com.yuyakaido.android.cardstackview.*
 import java.util.*
 
-class FilmActivity : AppCompatActivity(), CardStackListener {
 
+@Suppress("DEPRECATION")
+class FilmActivity : AppCompatActivity(), CardStackListener {
+    //@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+   // private val film = intent?.getSerializableExtra("filmList")  as? MutableList<Film>
+    private val filmList: MutableList<Film>? by lazy { intent.getSerializableExtra("filmList") as? MutableList<Film> }
     private val drawerLayout by lazy { findViewById<DrawerLayout>(R.id.drawer_layout) }
     private val cardStackView by lazy { findViewById<CardStackView>(R.id.card_stack_view) }
     private val manager by lazy { CardStackLayoutManager(this, this) }
-    private val adapter by lazy { CardStackAdapter(createSpots()) }
+    private val adapter by lazy { CardStackAdapter(createSpots(filmList)) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -131,47 +134,13 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
 
     private fun paginate() {
         val old = adapter.getSpots()
-        val new = old.plus(createSpots())
+        val new = old.plus(createSpots(filmList))
         val callback = SpotDiffCallback(old, new)
         val result = DiffUtil.calculateDiff(callback)
         adapter.setSpots(new)
         result.dispatchUpdatesTo(adapter)
     }
 
-    private fun reload() {
-        val old = adapter.getSpots()
-        val new = createSpots()
-        val callback = SpotDiffCallback(old, new)
-        val result = DiffUtil.calculateDiff(callback)
-        adapter.setSpots(new)
-        result.dispatchUpdatesTo(adapter)
-    }
-
-    private fun addFirst(size: Int) {
-        val old = adapter.getSpots()
-        val new = mutableListOf<Film>().apply {
-            addAll(old)
-            for (i in 0 until size) {
-                add(manager.topPosition, createSpot())
-            }
-        }
-        val callback = SpotDiffCallback(old, new)
-        val result = DiffUtil.calculateDiff(callback)
-        adapter.setSpots(new)
-        result.dispatchUpdatesTo(adapter)
-    }
-
-    private fun addLast(size: Int) {
-        val old = adapter.getSpots()
-        val new = mutableListOf<Film>().apply {
-            addAll(old)
-            addAll(List(size) { createSpot() })
-        }
-        val callback = SpotDiffCallback(old, new)
-        val result = DiffUtil.calculateDiff(callback)
-        adapter.setSpots(new)
-        result.dispatchUpdatesTo(adapter)
-    }
 
     private fun removeFirst(size: Int) {
         if (adapter.getSpots().isEmpty()) {
@@ -209,16 +178,6 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
         result.dispatchUpdatesTo(adapter)
     }
 
-    private fun replace() {
-        val old = adapter.getSpots()
-        val new = mutableListOf<Film>().apply {
-            addAll(old)
-            removeAt(manager.topPosition)
-            add(manager.topPosition, createSpot())
-        }
-        adapter.setSpots(new)
-        adapter.notifyItemChanged(manager.topPosition)
-    }
 
     private fun swap() {
         val old = adapter.getSpots()
@@ -235,21 +194,15 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
         result.dispatchUpdatesTo(adapter)
     }
 
-    private fun createSpot(): Film {
-        return Film(
-            name = "Мстители",
-            city = "Джосс Уидон",
-            url = "https://zakazposterov.ru/fotooboi/z/fotooboi-29746-mstiteli-zakazposterov-ru_z.jpg"
-        )
-    }
-
-    private fun createSpots(): List<Film> {
+    private fun createSpots(filmList: MutableList<Film>?): List<Film> {
         val spots = ArrayList<Film>()
-        spots.add(Film(name = "Мстители", city = "Джосс Уидон", url = "https://zakazposterov.ru/fotooboi/z/fotooboi-29746-mstiteli-zakazposterov-ru_z.jpg"))
-        spots.add(Film(name = "Анчартед: На картах не значится", city = "Рубен Фляйшер", url = "https://www.scifi-movies.com/images/contenu/data/0000222/affiche-avatar-2009-5.jpg"))
-        spots.add(Film(name = "Аватар", city = "Джеймс Кэмерон", url = "https://www.radyozeugma.com/wp-content/uploads/2022/03/uncharted-2022112143331.jpg"))
-        spots.add(Film(name = "Крестный отец", city = "Фрэнсис Форд Коппола", url = "https://de.web.img3.acsta.net/medias/nmedia/18/84/24/06/19732934.jpg"))
-        spots.add(Film(name = "Форд против Феррари", city = "Джеймс Мэнголд", url = "https://www.cinemabg.net/uploads/posts/2020-01/1580388721_1578078866_8236452.jpg"))
+        if (filmList != null) {
+            for (f in filmList)
+            {
+                spots.add(Film(f.id, f.title, f.rating, f.year, f.posterUrl))
+            }
+        }
+
         return spots
     }
 

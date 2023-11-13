@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="genreItems">
-         <item>Боевик</item>
-         <item>Комедия</item>
-         <item>Военный</item>
-         <item>Приключение</item>
-         <item>Криминал</item>
-         <item>Ужасы</item>
-         <item>Вестерн</item>
-         <item>Мультфильм</item>
-         <item>Аниме</item>
-         <item>Драма</item>
-         <item>Триллер</item>
-         <item>Фантастика</item>
-         <item>Детектив</item>
+         <item>боевик</item>
+         <item>комедия</item>
+         <item>военный</item>
+         <item>приключение</item>
+         <item>криминал</item>
+         <item>ужасы</item>
+         <item>вестерн</item>
+         <item>мультфильм</item>
+         <item>аниме</item>
+         <item>драма</item>
+         <item>триллер</item>
+         <item>фантастика</item>
+         <item>детектив</item>
     </string-array>
 
     <string-array name="sortItems">
-        <item>Рейтинг</item>
+        <item>RATING</item>
         <item>Дата выхода</item>
     </string-array>
 

@@ -20,13 +20,13 @@ class CardStackAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val film = films[position]
-        holder.name.text = "${film.id}. ${film.name}"
-        holder.city.text = film.city
+        holder.name.text = film.title
+        holder.city.text = film.year.toString()
         Glide.with(holder.image)
-            .load(film.url)
+            .load(film.posterUrl)
             .into(holder.image)
         holder.itemView.setOnClickListener { v ->
-            Toast.makeText(v.context, film.name, Toast.LENGTH_SHORT).show()
+            Toast.makeText(v.context, film.title, Toast.LENGTH_SHORT).show()
         }
     }
 

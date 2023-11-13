@@ -10,6 +10,9 @@ import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 
 
 class CreateActivity : AppCompatActivity() {
@@ -19,10 +22,15 @@ class CreateActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create)
 
+        currentLayout = findViewById(R.id.createLayout)
+
         val returnButton = findViewById<Button>(R.id.returnCButton)
         val createRoomButton = findViewById<Button>(R.id.continueButton)
         val addGenreButton = findViewById<Button>(R.id.addGenreButton)
-        currentLayout = findViewById(R.id.createLayout)
+
+        val genreValue: String = findViewById<Spinner>(R.id.genreSpinner).selectedItem.toString()
+        val sortValue: String = findViewById<Spinner>(R.id.sortSpinner).selectedItem.toString()
+        val quanityValue: String = findViewById<Spinner>(R.id.quanitySpinner).selectedItem.toString()
 
         addGenreButton.setOnClickListener { addSpinner() }
 
@@ -40,10 +48,14 @@ class CreateActivity : AppCompatActivity() {
             }
             else {
                 val intent = Intent(this, WaitingActivity::class.java)
+                intent.putExtra("genreValue", genreValue);
+                intent.putExtra("sortValue", sortValue);
+                intent.putExtra("quanityValue", quanityValue);
                 startActivity(intent)
             }
         }
     }
+
 
     private fun addSpinner() {
         val spinner = Spinner(this)
