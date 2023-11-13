@@ -1,6 +1,5 @@
 package com.example.myapplication
 
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -8,7 +7,6 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -20,13 +18,11 @@ import java.util.*
 
 @Suppress("DEPRECATION")
 class FilmActivity : AppCompatActivity(), CardStackListener {
-    //@RequiresApi(Build.VERSION_CODES.TIRAMISU)
-   // private val film = intent?.getSerializableExtra("filmList")  as? MutableList<Film>
     private val filmList: MutableList<Film>? by lazy { intent.getSerializableExtra("filmList") as? MutableList<Film> }
     private val drawerLayout by lazy { findViewById<DrawerLayout>(R.id.drawer_layout) }
     private val cardStackView by lazy { findViewById<CardStackView>(R.id.card_stack_view) }
     private val manager by lazy { CardStackLayoutManager(this, this) }
-    private val adapter by lazy { CardStackAdapter(createSpots(filmList)) }
+    private val adapter by lazy { CardStackAdapter(createSpots()) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,9 +45,6 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
 
     override fun onCardSwiped(direction: Direction) {
         Log.d("CardStackView", "onCardSwiped: p = ${manager.topPosition}, d = $direction")
-        if (manager.topPosition == adapter.itemCount - 5) {
-            paginate()
-        }
     }
 
     override fun onCardRewound() {
@@ -134,50 +127,21 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
 
     private fun paginate() {
         val old = adapter.getSpots()
-        val new = old.plus(createSpots(filmList))
+        val new = old.plus(createSpots())
         val callback = SpotDiffCallback(old, new)
         val result = DiffUtil.calculateDiff(callback)
         adapter.setSpots(new)
         result.dispatchUpdatesTo(adapter)
     }
 
-
-    private fun removeFirst(size: Int) {
-        if (adapter.getSpots().isEmpty()) {
-            return
-        }
-
+    private fun reload() {
         val old = adapter.getSpots()
-        val new = mutableListOf<Film>().apply {
-            addAll(old)
-            for (i in 0 until size) {
-                removeAt(manager.topPosition)
-            }
-        }
+        val new = createSpots()
         val callback = SpotDiffCallback(old, new)
         val result = DiffUtil.calculateDiff(callback)
         adapter.setSpots(new)
         result.dispatchUpdatesTo(adapter)
     }
-
-    private fun removeLast(size: Int) {
-        if (adapter.getSpots().isEmpty()) {
-            return
-        }
-
-        val old = adapter.getSpots()
-        val new = mutableListOf<Film>().apply {
-            addAll(old)
-            for (i in 0 until size) {
-                removeAt(this.size - 1)
-            }
-        }
-        val callback = SpotDiffCallback(old, new)
-        val result = DiffUtil.calculateDiff(callback)
-        adapter.setSpots(new)
-        result.dispatchUpdatesTo(adapter)
-    }
-
 
     private fun swap() {
         val old = adapter.getSpots()
@@ -194,13 +158,18 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
         result.dispatchUpdatesTo(adapter)
     }
 
-    private fun createSpots(filmList: MutableList<Film>?): List<Film> {
+    private fun createSpots(): List<Film> {
         val spots = ArrayList<Film>()
-        if (filmList != null) {
-            for (f in filmList)
-            {
-                spots.add(Film(f.id, f.title, f.rating, f.year, f.posterUrl))
-            }
+        Log.d("FILM_LIST_SIZE", filmList!!.size.toString())
+        for (i in 0 until filmList!!.size) {
+            spots.add(
+                Film(
+                    title = filmList!![i].title,
+                    rating = filmList!![i].rating,
+                    year = filmList!![i].year,
+                    posterUrl = filmList!![i].posterUrl
+                )
+            )
         }
 
         return spots

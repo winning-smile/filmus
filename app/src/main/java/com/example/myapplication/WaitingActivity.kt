@@ -72,6 +72,7 @@ class WaitingActivity : AppCompatActivity() {
             "документальный" to "22",
             "короткометражка" to "23",
             "аниме" to "24")
+
         val filmList = mutableListOf<Film>()
         val actualGenre = genreMap[genre]
         val targetUrl = URL("$url&genres=$actualGenre&order=$sortType&type=FILM&page=1")
@@ -80,8 +81,8 @@ class WaitingActivity : AppCompatActivity() {
         connection.setRequestProperty("X-API-KEY", apiToken)
         connection.requestMethod = "GET"
 
-        // val responseCode = connection.responseCode
-        // Log.w("respondeCode", responseCode.toString())
+        val responseCode = connection.responseCode
+        Log.w("respondeCode", responseCode.toString())
         val responseBody = connection.inputStream.bufferedReader().use { it.readText() }
         val json = JSONObject(responseBody).getJSONArray("items")
 

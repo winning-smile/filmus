@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -10,9 +11,6 @@ import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
-import org.json.JSONObject
-import java.net.HttpURLConnection
-import java.net.URL
 
 
 class CreateActivity : AppCompatActivity() {
@@ -27,10 +25,6 @@ class CreateActivity : AppCompatActivity() {
         val returnButton = findViewById<Button>(R.id.returnCButton)
         val createRoomButton = findViewById<Button>(R.id.continueButton)
         val addGenreButton = findViewById<Button>(R.id.addGenreButton)
-
-        val genreValue: String = findViewById<Spinner>(R.id.genreSpinner).selectedItem.toString()
-        val sortValue: String = findViewById<Spinner>(R.id.sortSpinner).selectedItem.toString()
-        val quanityValue: String = findViewById<Spinner>(R.id.quanitySpinner).selectedItem.toString()
 
         addGenreButton.setOnClickListener { addSpinner() }
 
@@ -48,9 +42,13 @@ class CreateActivity : AppCompatActivity() {
             }
             else {
                 val intent = Intent(this, WaitingActivity::class.java)
+                val genreValue: String = findViewById<Spinner>(R.id.genreSpinner).selectedItem.toString()
+                val sortValue: String = findViewById<Spinner>(R.id.sortSpinner).selectedItem.toString()
+                val quanityValue: String = findViewById<Spinner>(R.id.quanitySpinner).selectedItem.toString()
                 intent.putExtra("genreValue", genreValue);
                 intent.putExtra("sortValue", sortValue);
                 intent.putExtra("quanityValue", quanityValue);
+                Log.d("GENREVALUE", genreValue)
                 startActivity(intent)
             }
         }
