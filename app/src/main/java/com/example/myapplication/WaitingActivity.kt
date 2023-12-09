@@ -4,38 +4,70 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import org.json.JSONObject
 import java.io.Serializable
-import java.net.HttpURLConnection
-import java.net.URL
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import java.io.DataOutputStream
+import java.net.Socket
+import com.google.gson.Gson
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
+data class Params(val genre:String?, val sortType:String?)
+data class Response(val id:Int, val name:String, val rate:Float, val rateV2:Float, val year:Int, val posterURL: String)
 
 class WaitingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_waiting)
 
+        // UI элементы
         val returnButton = findViewById<Button>(R.id.returnWButton)
+        val codeText = findViewById<TextView>(R.id.codeTextView)
         val createRoomButton = findViewById<Button>(R.id.startFilmingButton)
 
-        val apiToken = "6a0de868-081f-4100-b6a2-d8aa65dd3296"
-        val url = "https://kinopoiskapiunofficial.tech/api/v2.2/films?"
+        returnButton.setOnClickListener{ finish() }
+
+        // Переменные для запроса
         val genreValue = intent.getStringExtra("genreValue")
         val sortValue = intent.getStringExtra("sortValue")
         val quValue = intent.getStringExtra("quanityValue")
         var filmList = mutableListOf<Film>()
+        val searchParams = Params(genreValue, sortValue)
+        val gson = Gson()
+        val json = gson.toJson(searchParams)
 
-        returnButton.setOnClickListener{ finish() }
-        fun getRequest() = runBlocking {
-            filmList = searchFilms(apiToken, url, genreValue, sortValue)
+        // ПОДКЛЮЧАЕМСЯ
+        val socket = Socket("192.168.0.12", 50000)
+
+        // ПОЛУЧАЕМ КОД ДЛЯ ПОДКЛЮЧЕНИЯ
+        val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
+        val code = reader.readLine()
+        Log.e("conn code", code)
+
+        codeText.text = code
+
+        // ОТПРАВЛЯЕМ ДАННЫЕ ДЛЯ ЗАПРОСА
+        val dataOutputStream = DataOutputStream(socket.getOutputStream())
+        dataOutputStream.writeUTF(json)
+        dataOutputStream.flush()
+
+        // ПОЛУЧАЕМ ФИЛЬМЫ
+        val films = mutableListOf<Response>()
+        val regex = Regex("\\{.*?\\}")
+        val data = reader.readLine()
+
+        regex.findAll(data).forEach { result ->
+            val film = gson.fromJson(result.value, Response::class.java)
+            films.add(film)
+            filmList += Film(fId=film.id, title=film.name, rating = film.rate, ratingV2 = film.rateV2, year = film.year, posterUrl = film.posterURL)
         }
 
-        getRequest()
+        films.clear()
+
+        dataOutputStream.close()
+        reader.close()
+        socket.close()
 
         createRoomButton.setOnClickListener {
             val intent = Intent(this, FilmActivity::class.java)
@@ -45,52 +77,6 @@ class WaitingActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
-    }
-
-    suspend fun searchFilms(apiToken: String, url: String?, genre : String?, sortType : String?):  MutableList<Film> = withContext(Dispatchers.IO) {
-        val genreMap = mapOf("триллер" to 1,
-            "драма" to "2",
-            "криминал" to "3",
-            "мелодрама" to "4",
-            "детектив" to "5",
-            "фантастика" to "6",
-            "приключения" to "7",
-            "биография" to "8",
-            "фильм-нуар" to "9",
-            "вестерн" to "10",
-            "боевик" to "11",
-            "фэнтези" to "12",
-            "комедия" to "13",
-            "военный" to "14",
-            "история" to "15",
-            "музыка" to "16",
-            "ужасы" to "17",
-            "мультфильм" to "18",
-            "семейный" to "19",
-            "мюзикл" to "20",
-            "спорт" to "21",
-            "документальный" to "22",
-            "короткометражка" to "23",
-            "аниме" to "24")
-
-        val filmList = mutableListOf<Film>()
-        val actualGenre = genreMap[genre]
-        val targetUrl = URL("$url&genres=$actualGenre&order=$sortType&type=FILM&page=1")
-
-        val connection = targetUrl.openConnection() as HttpURLConnection
-        connection.setRequestProperty("X-API-KEY", apiToken)
-        connection.requestMethod = "GET"
-
-        val responseCode = connection.responseCode
-        Log.w("respondeCode", responseCode.toString())
-        val responseBody = connection.inputStream.bufferedReader().use { it.readText() }
-        val json = JSONObject(responseBody).getJSONArray("items")
-
-        for (i in 0..<json.length()) {
-            val movie = json.getJSONObject(i)
-            filmList += Film(title=movie.getString("nameRu"), rating = movie.getInt("ratingKinopoisk"), year = movie.getInt("year"), posterUrl = movie.getString("posterUrl"))
-        }
-        filmList
     }
 }
 

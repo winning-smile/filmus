@@ -125,38 +125,6 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
         }
     }
 
-    private fun paginate() {
-        val old = adapter.getSpots()
-        val new = old.plus(createSpots())
-        val callback = SpotDiffCallback(old, new)
-        val result = DiffUtil.calculateDiff(callback)
-        adapter.setSpots(new)
-        result.dispatchUpdatesTo(adapter)
-    }
-
-    private fun reload() {
-        val old = adapter.getSpots()
-        val new = createSpots()
-        val callback = SpotDiffCallback(old, new)
-        val result = DiffUtil.calculateDiff(callback)
-        adapter.setSpots(new)
-        result.dispatchUpdatesTo(adapter)
-    }
-
-    private fun swap() {
-        val old = adapter.getSpots()
-        val new = mutableListOf<Film>().apply {
-            addAll(old)
-            val first = removeAt(manager.topPosition)
-            val last = removeAt(this.size - 1)
-            add(manager.topPosition, last)
-            add(first)
-        }
-        val callback = SpotDiffCallback(old, new)
-        val result = DiffUtil.calculateDiff(callback)
-        adapter.setSpots(new)
-        result.dispatchUpdatesTo(adapter)
-    }
 
     private fun createSpots(): List<Film> {
         val spots = ArrayList<Film>()
