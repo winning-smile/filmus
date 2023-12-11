@@ -10,11 +10,14 @@ import java.io.Serializable
 import java.io.DataOutputStream
 import java.net.Socket
 import com.google.gson.Gson
+import kotlinx.coroutines.runBlocking
 import java.io.BufferedReader
+import android.os.AsyncTask
+import kotlinx.coroutines.*
 import java.io.InputStreamReader
 
 data class Params(val genre:String?, val sortType:String?)
-data class Response(val id:Int, val name:String, val rate:Float, val rateV2:Float, val year:Int, val posterURL: String)
+data class Response(val id:Int, val name:String, val rate:Float, val rateV2:Float, val year:Int, val posterUrl:String)
 
 class WaitingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,43 +40,45 @@ class WaitingActivity : AppCompatActivity() {
         val gson = Gson()
         val json = gson.toJson(searchParams)
 
-        // ПОДКЛЮЧАЕМСЯ
-        val socket = Socket("192.168.0.12", 50000)
+        runBlocking {
+            val scope = CoroutineScope(Dispatchers.IO)
+            val job = scope.launch {
+                // ПОДКЛЮЧАЕМСЯ
+                val socket = Socket("192.168.0.12", 50000)
+                val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
+                val dataOutputStream = DataOutputStream(socket.getOutputStream())
 
-        // ПОЛУЧАЕМ КОД ДЛЯ ПОДКЛЮЧЕНИЯ
-        val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
-        val code = reader.readLine()
-        Log.e("conn code", code)
+                // ПОЛУЧАЕМ КОД ДЛЯ ПОДКЛЮЧЕНИЯ
+                val code = reader.readLine()
+                Log.e("conn code", code)
+                codeText.text = code
 
-        codeText.text = code
+                // ОТПРАВЛЯЕМ ДАННЫЕ ДЛЯ ЗАПРОСА
+                dataOutputStream.writeUTF(json)
+                dataOutputStream.flush()
 
-        // ОТПРАВЛЯЕМ ДАННЫЕ ДЛЯ ЗАПРОСА
-        val dataOutputStream = DataOutputStream(socket.getOutputStream())
-        dataOutputStream.writeUTF(json)
-        dataOutputStream.flush()
+                // ПОЛУЧАЕМ ФИЛЬМЫ
+                val regex = Regex("\\{.*?\\}")
+                val data = reader.readLine()
 
-        // ПОЛУЧАЕМ ФИЛЬМЫ
-        val films = mutableListOf<Response>()
-        val regex = Regex("\\{.*?\\}")
-        val data = reader.readLine()
+                regex.findAll(data).forEach { result ->
+                    val film = gson.fromJson(result.value, Response::class.java)
+                    filmList += Film(fId=film.id, title=film.name, rating = film.rate,
+                        ratingV2 = film.rateV2, year = film.year,
+                        posterUrl = "https://kinopoiskapiunofficial.tech/images/posters/kp/"+ film.id +".jpg")
 
-        regex.findAll(data).forEach { result ->
-            val film = gson.fromJson(result.value, Response::class.java)
-            films.add(film)
-            filmList += Film(fId=film.id, title=film.name, rating = film.rate, ratingV2 = film.rateV2, year = film.year, posterUrl = film.posterURL)
+                }
+                dataOutputStream.close()
+                reader.close()
+                socket.close()
+            }
         }
-
-        films.clear()
-
-        dataOutputStream.close()
-        reader.close()
-        socket.close()
 
         createRoomButton.setOnClickListener {
             val intent = Intent(this, FilmActivity::class.java)
             intent.putExtra("filmList", filmList as Serializable?)
             for (film in filmList){
-                Log.d("FILM_LIST", film.title)
+                Log.d("FILM_LIST", film.posterUrl)
             }
             startActivity(intent)
         }

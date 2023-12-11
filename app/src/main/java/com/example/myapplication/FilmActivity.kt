@@ -132,8 +132,10 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
         for (i in 0 until filmList!!.size) {
             spots.add(
                 Film(
+                    fId = filmList!![i].fId,
                     title = filmList!![i].title,
                     rating = filmList!![i].rating,
+                    ratingV2 = filmList!![i].ratingV2,
                     year = filmList!![i].year,
                     posterUrl = filmList!![i].posterUrl
                 )
