@@ -29,6 +29,7 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
         setContentView(R.layout.activity_film)
         setupCardStackView()
         setupButton()
+        val conn = SocketHandler
     }
 
     override fun onBackPressed() {
