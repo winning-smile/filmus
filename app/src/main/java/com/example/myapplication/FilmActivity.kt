@@ -13,6 +13,10 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import com.yuyakaido.android.cardstackview.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.*
 
 
@@ -64,6 +68,14 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
     override fun onCardDisappeared(view: View, position: Int) {
         val textView = view.findViewById<TextView>(R.id.item_name)
         Log.d("CardStackView", "onCardDisappeared: ($position) ${textView.text}")
+        val conn = SocketHandler
+        runBlocking {
+            val scope = CoroutineScope(Dispatchers.IO)
+            val job = scope.launch {
+                conn.writer.write("test".toByteArray())
+                conn.writer.flush()
+            }
+        }
     }
 
     private fun setupCardStackView() {

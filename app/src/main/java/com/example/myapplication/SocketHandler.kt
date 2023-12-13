@@ -6,21 +6,19 @@ import java.net.Socket
 
 
 object SocketHandler {
-    private var socket: Socket? = null
-    var reader: BufferedReader? = null
-    var writer: DataOutputStream? = null
+    private lateinit var socket: Socket
+    lateinit var reader: BufferedReader
+    lateinit var writer: DataOutputStream
 
     fun connectSocket() {
-        if (socket == null) {
-            socket = Socket("192.168.0.12", 50000)
-            reader = BufferedReader(InputStreamReader(socket!!.getInputStream()))
-            writer = DataOutputStream(socket!!.getOutputStream())
-        }
+        socket = Socket("192.168.0.12", 50000)
+        reader = BufferedReader(InputStreamReader(socket.getInputStream()))
+        writer = DataOutputStream(socket.getOutputStream())
     }
 
     fun closeSocket() {
-        writer?.close()
-        reader?.close()
-        socket?.close()
+        writer.close()
+        reader.close()
+        socket.close()
     }
 }
