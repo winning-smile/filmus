@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.drawerlayout.widget.DrawerLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
@@ -42,15 +42,15 @@
                     android:id="@+id/rewind_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="32dp"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginRight="32dp"
-                    android:layout_marginEnd="32dp"
                     android:layout_centerInParent="true"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginLeft="32dp"
+                    android:layout_marginEnd="32dp"
+                    android:layout_marginRight="32dp"
                     android:src="@drawable/rewind_blue_24dp"
                     app:backgroundTint="@android:color/white"
                     app:fabSize="mini"
-                    app:rippleColor="#225BC9FA"/>
+                    app:rippleColor="#225BC9FA" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/like_button"
@@ -79,4 +79,50 @@
 
     </LinearLayout>
 
-</androidx.drawerlayout.widget.DrawerLayout>
+    <LinearLayout
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.9"
+        android:background="@android:color/darker_gray"
+        android:orientation="vertical"
+        android:translationY="300px"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="100dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <TextView
+            android:id="@+id/bottom_sheet_title"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Title"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/bottom_sheet_rating"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Rating"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/bottom_sheet_rating_v2"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="RatingV2"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/bottom_sheet_year"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:gravity="center"
+            android:text="Year"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

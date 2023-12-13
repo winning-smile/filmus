@@ -11,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.Serializable
@@ -32,42 +33,38 @@ class JoinActivity : AppCompatActivity() {
         val codeJoinField = findViewById<TextView>(R.id.codeJoinField)
         val joinCode = codeJoinField.text
         var test = 50000
-
-       // for (i in joinCode.indices){
-        //    test += codeDict[joinCode[i]]
-        //}//
-
+        val conn = SocketHandler
 
 
         returnButton.setOnClickListener{
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        }
-
-        joinFilmButton.setOnClickListener {
             runBlocking {
                 val scope = CoroutineScope(Dispatchers.IO)
                 val job = scope.launch {
                     // ПОДКЛЮЧАЕМСЯ
-                    val socket = Socket("192.168.0.12", test.toInt())
-                    val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
+                    conn.connectSocket()
+                    // ОТПРАВЛЯЕМ ФЛАГ
+                    conn.writer.write("join".toByteArray())
+                    conn.writer.flush()
 
                     // ПОЛУЧАЕМ ФИЛЬМЫ
                     val regex = Regex("\\{.*?\\}")
-                    val data = reader.readLine()
+                    val data = withContext(Dispatchers.IO) {
+                        conn.reader.readLine()
+                    }
+                    Log.d("reader conn", data)
 
                     regex.findAll(data).forEach { result ->
                         val film = gson.fromJson(result.value, Response::class.java)
-                        filmList += Film(fId=film.id, title=film.name, rating = film.rate,
+                        filmList += Film(fId=film.id, title=film.name.toString(), rating = film.rate,
                             ratingV2 = film.rateV2, year = film.year,
                             posterUrl = "https://kinopoiskapiunofficial.tech/images/posters/kp/"+ film.id +".jpg")
-
                     }
-                    reader.close()
-                    socket.close()
                 }
             }
+        }
 
+
+        joinFilmButton.setOnClickListener {
             val intent = Intent(this, FilmActivity::class.java)
             intent.putExtra("filmList", filmList as Serializable?)
             for (film in filmList){

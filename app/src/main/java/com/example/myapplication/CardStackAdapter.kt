@@ -20,8 +20,11 @@ class CardStackAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val film = films[position]
-        holder.name.text = film.title
-        holder.city.text = film.year.toString()
+        holder.name.text = film.title.toString()
+        holder.fid.text = film.fId.toString()
+        holder.fyear.text = film.year.toString()
+        holder.rate.text = film.rating.toString()
+        holder.ratev2.text = film.ratingV2.toString()
         Glide.with(holder.image)
             .load(film.posterUrl)
             .into(holder.image)
@@ -44,7 +47,10 @@ class CardStackAdapter(
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.item_name)
-        var city: TextView = view.findViewById(R.id.item_city)
+        var fid: TextView = view.findViewById(R.id.item_id)
+        var fyear: TextView = view.findViewById(R.id.item_year)
+        var rate: TextView = view.findViewById(R.id.item_rate)
+        var ratev2: TextView = view.findViewById(R.id.item_ratev2)
         var image: ImageView = view.findViewById(R.id.item_image)
     }
 

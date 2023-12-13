@@ -67,7 +67,7 @@ class WaitingActivity : AppCompatActivity() {
 
                 regex.findAll(data).forEach { result ->
                     val film = gson.fromJson(result.value, Response::class.java)
-                    filmList += Film(fId=film.id, title=film.name, rating = film.rate,
+                    filmList += Film(fId=film.id, title=film.name.toString(), rating = film.rate,
                         ratingV2 = film.rateV2, year = film.year,
                         posterUrl = "https://kinopoiskapiunofficial.tech/images/posters/kp/"+ film.id +".jpg")
                 }

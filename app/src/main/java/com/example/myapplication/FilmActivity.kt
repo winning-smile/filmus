@@ -6,12 +6,15 @@ import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
+import android.view.animation.TranslateAnimation
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.yuyakaido.android.cardstackview.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,13 +30,17 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
     private val cardStackView by lazy { findViewById<CardStackView>(R.id.card_stack_view) }
     private val manager by lazy { CardStackLayoutManager(this, this) }
     private val adapter by lazy { CardStackAdapter(createSpots()) }
+    private val likeDict = mutableMapOf<String, String>()
+    private lateinit var swipeDir: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_film)
         setupCardStackView()
+        val bottomSheet = findViewById<View>(R.id.bottom_sheet)
+        val behavior = BottomSheetBehavior.from(bottomSheet)
+        behavior.state = BottomSheetBehavior.STATE_HIDDEN
         setupButton()
-        val conn = SocketHandler
     }
 
     override fun onBackPressed() {
@@ -49,7 +56,7 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
     }
 
     override fun onCardSwiped(direction: Direction) {
-        Log.d("CardStackView", "onCardSwiped: p = ${manager.topPosition}, d = $direction")
+        swipeDir = direction.toString()
     }
 
     override fun onCardRewound() {
@@ -61,21 +68,27 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
     }
 
     override fun onCardAppeared(view: View, position: Int) {
-        val textView = view.findViewById<TextView>(R.id.item_name)
-        Log.d("CardStackView", "onCardAppeared: ($position) ${textView.text}")
+        updateBottomSheet(view.findViewById<TextView>(R.id.item_name).text.toString(),
+            view.findViewById<TextView>(R.id.item_year).text.toString(),
+            view.findViewById<TextView>(R.id.item_rate).text.toString(),
+            view.findViewById<TextView>(R.id.item_ratev2).text.toString())
+    }
+
+    private fun updateBottomSheet(p1:String, p2:String, p3:String, p4:String){
+        val view = findViewById<View>(R.id.bottom_sheet)
+        val titleView = view.findViewById<TextView>(R.id.bottom_sheet_title)
+        titleView.text = p1
+        val yearView = view.findViewById<TextView>(R.id.bottom_sheet_year)
+        yearView.text = p2
+        val rateView = view.findViewById<TextView>(R.id.bottom_sheet_rating)
+        rateView.text = p3
+        val rate2View = view.findViewById<TextView>(R.id.bottom_sheet_rating_v2)
+        rate2View.text = p4
     }
 
     override fun onCardDisappeared(view: View, position: Int) {
-        val textView = view.findViewById<TextView>(R.id.item_name)
-        Log.d("CardStackView", "onCardDisappeared: ($position) ${textView.text}")
-        val conn = SocketHandler
-        runBlocking {
-            val scope = CoroutineScope(Dispatchers.IO)
-            val job = scope.launch {
-                conn.writer.write("test".toByteArray())
-                conn.writer.flush()
-            }
-        }
+        val filmId = view.findViewById<TextView>(R.id.item_id)
+        likeDict["$filmId"] = swipeDir
     }
 
     private fun setupCardStackView() {
@@ -95,14 +108,20 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
         }
 
         val rewind = findViewById<View>(R.id.rewind_button)
+        val bottomSheet = findViewById<View>(R.id.bottom_sheet)
+        val behavior = BottomSheetBehavior.from(bottomSheet)
+
         rewind.setOnClickListener {
-            val setting = RewindAnimationSetting.Builder()
-                .setDirection(Direction.Bottom)
-                .setDuration(Duration.Normal.duration)
-                .setInterpolator(DecelerateInterpolator())
-                .build()
-            manager.setRewindAnimationSetting(setting)
-            cardStackView.rewind()
+            Log.d("REWIND BUTTON CLICK", "YEAH")
+
+            if (behavior.state != BottomSheetBehavior.STATE_EXPANDED) {
+                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                Log.d("expanded", "true")
+            } else {
+                behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                behavior.state = BottomSheetBehavior.STATE_HIDDEN
+                Log.d("expanded", "false")
+            }
         }
 
         val like = findViewById<View>(R.id.like_button)
