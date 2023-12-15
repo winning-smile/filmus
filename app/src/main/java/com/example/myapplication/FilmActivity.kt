@@ -171,7 +171,7 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
         manager.setMaxDegree(20.0f)
         manager.setDirections(Direction.HORIZONTAL)
         manager.setCanScrollHorizontal(true)
-        manager.setCanScrollVertical(false) //ЕСЛИ ПРИЛА ЛЯЖЕТ ПРОБЛЕМА ТУТ <--------------------------------------------------------------------
+        manager.setCanScrollVertical(false)
         manager.setSwipeableMethod(SwipeableMethod.AutomaticAndManual)
         manager.setOverlayInterpolator(LinearInterpolator())
         cardStackView.layoutManager = manager

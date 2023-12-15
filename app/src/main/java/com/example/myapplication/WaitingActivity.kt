@@ -41,7 +41,7 @@ class WaitingActivity : AppCompatActivity() {
 
         runBlocking {
             val scope = CoroutineScope(Dispatchers.IO)
-            val job = scope.launch {
+            scope.launch {
                 // ПОДКЛЮЧАЕМСЯ
                 conn.connectSocket()
                 // ОТПРАВЛЯЕМ ФЛАГ
@@ -49,9 +49,6 @@ class WaitingActivity : AppCompatActivity() {
                 conn.writer.flush()
                 // ПОЛУЧАЕМ КОД ДЛЯ ПОДКЛЮЧЕНИЯ
                 val code = conn.reader.readLine()
-                if (code != null) {
-                    Log.e("conn code", code)
-                }
                 codeText.text = code
 
                 // ОТПРАВЛЯЕМ ДАННЫЕ ДЛЯ ЗАПРОСА

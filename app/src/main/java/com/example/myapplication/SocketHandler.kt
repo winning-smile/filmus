@@ -5,7 +5,7 @@ import java.io.InputStreamReader
 import java.net.Socket
 
 
-object SocketHandler {
+object SocketHandler{
     private lateinit var socket: Socket
     lateinit var reader: BufferedReader
     lateinit var writer: DataOutputStream
