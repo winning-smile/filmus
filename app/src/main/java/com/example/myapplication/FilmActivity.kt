@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -15,13 +16,16 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.gson.Gson
 import com.yuyakaido.android.cardstackview.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.util.*
 
+import kotlinx.coroutines.withContext
+import java.io.Serializable
+import java.util.*
 
 @Suppress("DEPRECATION")
 class FilmActivity : AppCompatActivity(), CardStackListener {
@@ -30,8 +34,8 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
     private val cardStackView by lazy { findViewById<CardStackView>(R.id.card_stack_view) }
     private val manager by lazy { CardStackLayoutManager(this, this) }
     private val adapter by lazy { CardStackAdapter(createSpots()) }
-    private val likeDict = mutableMapOf<String, String>()
-    private lateinit var swipeDir: String
+    private val idList = mutableListOf<String>()
+    private val dirList = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +60,7 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
     }
 
     override fun onCardSwiped(direction: Direction) {
-        swipeDir = direction.toString()
+        dirList.add(direction.toString())
     }
 
     override fun onCardRewound() {
@@ -72,6 +76,7 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
             view.findViewById<TextView>(R.id.item_year).text.toString(),
             view.findViewById<TextView>(R.id.item_rate).text.toString(),
             view.findViewById<TextView>(R.id.item_ratev2).text.toString())
+        idList.add(view.findViewById<TextView>(R.id.item_id).text.toString())
     }
 
     private fun updateBottomSheet(p1:String, p2:String, p3:String, p4:String){
@@ -87,8 +92,29 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
     }
 
     override fun onCardDisappeared(view: View, position: Int) {
-        val filmId = view.findViewById<TextView>(R.id.item_id)
-        likeDict["$filmId"] = swipeDir
+        Log.d("FILM COUNT", manager.topPosition.toString())
+        if (manager.topPosition == 20) {
+            runBlocking {
+                val conn = SocketHandler
+                val scope = CoroutineScope(Dispatchers.IO)
+                val data: Map<String, String> = idList.zip(dirList).toMap()
+                val gson = Gson()
+                val json = gson.toJson(data)
+
+                val job = scope.launch {
+                    // ПОДКЛЮЧАЕМСЯ
+                    conn.connectSocket()
+                    // ОТПРАВЛЯЕМ ФЛАГ
+                    conn.writer.write("result".toByteArray())
+                    conn.writer.flush()
+                    // ОТПРАВЛЯЕМ ДАННЫЕ О ФИЛЬМАХ
+                    conn.writer.writeUTF(json)
+                    conn.writer.flush()
+                }
+            }
+            val intent = Intent(this, Final::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun setupCardStackView() {
@@ -145,7 +171,7 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
         manager.setMaxDegree(20.0f)
         manager.setDirections(Direction.HORIZONTAL)
         manager.setCanScrollHorizontal(true)
-        manager.setCanScrollVertical(true)
+        manager.setCanScrollVertical(false) //ЕСЛИ ПРИЛА ЛЯЖЕТ ПРОБЛЕМА ТУТ <--------------------------------------------------------------------
         manager.setSwipeableMethod(SwipeableMethod.AutomaticAndManual)
         manager.setOverlayInterpolator(LinearInterpolator())
         cardStackView.layoutManager = manager
@@ -174,6 +200,7 @@ class FilmActivity : AppCompatActivity(), CardStackListener {
             )
         }
 
+        spots.add(Film(fId=666, title="THE END OF SWIPING", rating = 0F, ratingV2 = 0F, year = 0, posterUrl = "https://images-na.ssl-images-amazon.com/images/I/71P0iCaWUTL._SL1000_.jpg"))
         return spots
     }
 
