@@ -8,41 +8,25 @@ import android.widget.TextView
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-
-data class resFilm(val title:String)
+import kotlin.coroutines.suspendCoroutine
 
 class Final : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_final)
-        val layout = findViewById<LinearLayout>(R.id.finalLayout)
-        val filmList = recieve()
-
-        for (film in filmList){
-            Log.d("FINAL", film.title)
-        }
-
-        for (film in filmList){
-            Log.d("filmCycle", film.title)
-            val textView = TextView(this)
-            textView.text = film.title
-            textView.textSize = 20f
-            textView.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-
-            layout.addView(textView)
-        }
+        recieve(this)
     }
 
-    fun recieve(): MutableList<Film> {
+    fun recieve(context:AppCompatActivity) {
         val conn = SocketHandler
         val gson = Gson()
-        var filmList = mutableListOf<Film>()
+        val filmList = mutableListOf<Film>()
+        val layout = findViewById<LinearLayout>(R.id.finalLayout)
         runBlocking {
             val scope = CoroutineScope(Dispatchers.IO)
             val job = scope.launch {
@@ -54,20 +38,36 @@ class Final : AppCompatActivity() {
 
                 // ПОЛУЧАЕМ ФИЛЬМЫ
                 val regex = Regex("\\{.*?\\}")
-                val data = conn.reader.readLine()
 
-                Log.d("reader conn", data)
+                val data: String? = conn.reader.readLine()
 
-                regex.findAll(data).forEach { result ->
-                    val film = gson.fromJson(result.value, Response::class.java)
-                    filmList += Film(fId=film.id, title=film.name.toString(), rating = film.rate,
-                        ratingV2 = film.rateV2, year = film.year,
-                        posterUrl = "https://kinopoiskapiunofficial.tech/images/posters/kp/"+ film.id +".jpg")
-                    Log.d("FILM NAME", film.name)
+                Log.d("DATA_skipped", "true")
+                if (data != null) {
+                    regex.findAll(data).forEach { result ->
+                        val film = gson.fromJson(result.value, Response::class.java)
+                        filmList += Film(fId=film.id, title=film.name.toString(), rating = film.rate,
+                            ratingV2 = film.rateV2, year = film.year,
+                            posterUrl = "https://kinopoiskapiunofficial.tech/images/posters/kp/"+ film.id +".jpg")
+                        Log.d("FILM NAME", film.name)
+                    }
+
+                    runOnUiThread {
+                        for (film in filmList) {
+                            Log.d("filmCycle", film.title)
+                            val textView = TextView(context)
+                            textView.text = film.title
+                            textView.textSize = 20f
+                            textView.layoutParams = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            )
+                            layout.addView(textView)
+                        }
+                    }
+
                 }
+
             }
         }
-
-        return filmList
     }
 }
